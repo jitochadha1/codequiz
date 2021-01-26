@@ -3,7 +3,7 @@ var correct = 0;
 
 var myQuestions = [
 	{
-		question: "What is 10/2?",
+		question: "What are variables used for in JavaScript programs?",
 		answers: {
 			a: '3',
 			b: '5',
