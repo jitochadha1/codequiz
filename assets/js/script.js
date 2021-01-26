@@ -217,9 +217,8 @@ loadHighScores();
 
 function handleGoBack() {
 	hideHighScores();
-	showIntro();
 	resetQuiz();
-	
+	showIntro();
 }
 function resetTimer() {
 	time = 71;
@@ -228,6 +227,8 @@ function handleClearHighScores() {
 	highScores = [];
 	saveHighScores();
 	showHighScores();
+	let highScoresList = document.getElementById("highScoresList");
+	highScoresList.innerHTML="";
 }
 function hideHighScores() {
 	let highScoresSection = document.getElementById("highscores");
@@ -248,6 +249,7 @@ function resetCorrectAnswers() {
 }
 function resetPosition() {
 	position = 0;
+	currentQuestion = myQuestions[0];
 }
 
 let goBackButton = document.getElementById("goback");
