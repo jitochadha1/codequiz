@@ -16,29 +16,41 @@
       <h1>View High Scores</h1>
     </div>
     <div class="time-left">
-      <p>Time:_____</p>
+      <p>Time:<span id="time"></span></p>
     </div>
 
   </nav>>
 
   <main class="page-content" id="page-content">
     <!-- Question -->
+    <section id="intro">
+      <h2>This is a JavaScript quiz</h2>
+      <button id="startquiz">Start Quiz</button>
+    </section>
     <section class="question" id="question">
-      <h2 class="q1">Arrays in Javascript can be used to store which one of the following?</h2>
-      <li class="answer" id="q1a1">
-        <button>1. answer 1</button>
-      </li>
-      <li class="answer" id="a2">
-        <button>2. answer 2</button>
-      </li>
-      <li class="answer" id="a3">
-        <button>3. answer 3</button>
-      </li>
-      <li class="answer" id="a4">
-        <button>4. answer 4</button>
-      </li>
+      <h2 class="q1" id="questionTitle">Arrays in Javascript can be used to store which one of the following?</h2>
+      <ol>
+        <li class="answer">
+          <button id="a1">answer 1</button>
+        </li>
+        <li class="answer">
+          <button id="a2">answer 2</button>
+        </li>
+        <li class="answer">
+          <button id="a3">answer 3</button>
+        </li>
+        <li class="answer">
+          <button id="a4">answer 4</button>
+        </li>
+      </ol>
+      
       <h3 class="checker" id="checkanswer">right or wrong alert</h3>
     </section>
+
+  <section id="results">
+    <h3 id="resultsTitle"></h3>
+    <h4 id="resultsScore"></h4>
+  </section>
     <!-- Answers -->
     <footer>
       &copy;2020 by Codequiz

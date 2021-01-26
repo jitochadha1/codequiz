@@ -32,4 +32,10 @@ body {
   color: black;
 }
 
+#intro {
+  display: inline;
+}
 
+#question {
+  display: none;
+}
