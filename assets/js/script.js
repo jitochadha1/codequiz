@@ -1,8 +1,10 @@
-var position = 0;
-var correct = 0;
+let position = 0;
+let correct = 0;
+let time = 0;
+let highScores = [
 
-
-var myQuestions = [
+];
+let myQuestions = [
 	{
 		questiontext: "What are variables used for in JavaScript programs?",
 		answers: {
@@ -44,100 +46,18 @@ var myQuestions = [
 		correctAnswer: 'c'
 	}
 ];
-var currentQuestion = myQuestions[0];
-// var quizContainer = document.getElementById('question');
-// var resultsContainer = document.getElementById('results');
-// var submitButton = document.getElementById('submit');
-
-// generateQuiz(myQuestions, quizContainer, resultsContainer, submitButton);
-
-// function generateQuiz(questions, quizContainer, resultsContainer, submitButton){
-
-// 	function showQuestions(questions, quizContainer){
-// 		// we'll need a place to store the output and the answer choices
-// 		var output = [];
-// 		var answers;
-
-// 		// for each question...
-// 		for(var i=0; i<questions.length; i++){
-
-// 			// first reset the list of answers
-// 			answers = [];
-
-// 			// for each available answer...
-// 			for(letter in questions[i].answers){
-
-// 				// ...add an html radio button
-// 				answers.push(
-// 					'<label>'
-// 						+ '<input type="radio" name="question'+i+'" value="'+letter+'">'
-// 						+ letter + ': '
-// 						+ questions[i].answers[letter]
-// 					+ '</label>'
-// 				);
-// 			}
-
-// 			// add this question and its answers to the output
-// 			output.push(
-// 				'<div class="question">' + questions[i].question + '</div>'
-// 				+ '<div class="answers">' + answers.join('') + '</div>'
-// 			);
-// 		}
-
-// 		// finally combine our output list into one string of html and put it on the page
-// 		quizContainer.innerHTML = output.join('');
-// 	}
-
-
-// 	function showResults(questions, quizContainer, resultsContainer){
-
-// 		// gather answer containers from our quiz
-// 		var answerContainers = quizContainer.querySelectorAll('.answers');
-
-// 		// keep track of user's answers
-// 		var userAnswer = '';
-// 		var numCorrect = 0;
-
-// 		// for each question...
-// 		for(var i=0; i<questions.length; i++){
-
-// 			// find selected answer
-// 			userAnswer = (answerContainers[i].querySelector('input[name=question'+i+']:checked')||{}).value;
-
-// 			// if answer is correct
-// 			if(userAnswer===questions[i].correctAnswer){
-// 				// add to the number of correct answers
-// 				numCorrect++;
-
-// 				// color the answers green
-// 				answerContainers[i].style.color = 'lightgreen';
-// 			}
-// 			// if answer is wrong or blank
-// 			else{
-// 				// color the answers red
-// 				answerContainers[i].style.color = 'red';
-// 			}
-// 		}
-
-// 		// show number of correct answers out of total
-// 		resultsContainer.innerHTML = numCorrect + ' out of ' + questions.length;
-// 	}
-
-// 	// show questions right away
-// 	showQuestions(questions, quizContainer);
-
-// 	// on submit, show results
-// 	submitButton.onclick = function(){
-// 		showResults(questions, quizContainer, resultsContainer);
-// 	}
-
-// }
-
-
-
+let currentQuestion = myQuestions[0];
+let timeIntervalId;
+function showIntro() {
+	let intro = document.getElementById("intro");
+	intro.style.display = "block";
+}
 function hideIntro() {
 	let intro = document.getElementById("intro");
 	intro.style.display = "none";
+}
+function loadHighScores() {
+	highScores = JSON.parse(localStorage.getItem("highScores")) || [];
 }
 
 function showquestions() {
@@ -149,6 +69,33 @@ function startquiz() {
 	showquestions();
 	displayCurrentQuestion();
 	displayCurrentAnswerChoices();
+	startTimer();
+}
+function startTimer() {
+	resetTimer();
+	timeIntervalId = setInterval(function () {
+		if (time <= 0) {
+			endTime();
+		} else {
+			decreaseTime();
+			displayCurrentTime();
+		}
+	}, 1000)
+}
+function endTime() {
+	clearInterval(timeIntervalId);
+}
+
+function decreaseTime() {
+	if (time > 0) {
+		time = time - 1;
+	} else {
+		endQuiz();
+	}
+}
+function displayCurrentTime() {
+	let currentTimeElement = document.getElementById("time");
+	currentTimeElement.innerText = time;
 }
 function displayCurrentQuestion() {
 	let questionTitle = document.getElementById("questionTitle");
@@ -169,8 +116,16 @@ function chooseAnswer(choice) {
 
 	let correctAnswer = currentQuestion.correctAnswer;
 	if (choice === correctAnswer) {
-		correct = correct + 1
+		correct = correct + 1;
+		answerChoiceFeedback("Correct");
+	} else {
+		time = Math.max(time - 10, 0);
+		displayCurrentTime();
+		answerChoiceFeedback("Wrong");
 	}
+	setTimeout(function() {
+		answerChoiceFeedback(""); 
+	}, 1000)
 	nextQuestion();
 }
 function nextQuestion() {
@@ -178,7 +133,7 @@ function nextQuestion() {
 		endQuiz();
 		return;
 	}
-		
+
 	position = position + 1;
 
 	currentQuestion = myQuestions[position];
@@ -189,6 +144,7 @@ function nextQuestion() {
 function endQuiz() {
 	hideQuiz();
 	showResults();
+	endTime();
 }
 
 function hideQuiz() {
@@ -202,11 +158,103 @@ function showResults() {
 	resultsTitle.innerText = `All Done!`
 	let resultsScore = document.getElementById("resultsScore");
 	resultsScore.innerText = `Your score is: ${score}`;
+	let results = document.getElementById("results");
+	results.style.display = "block";
 }
 
 function calculateScore() {
-	return 0;
+
+	return correct * time;
 }
+
+function handleInitialSubmission() {
+	let initialsInput = document.getElementById("initials");
+	let initialsValue = initialsInput.value;
+	let score = calculateScore();
+	addHighScore(initialsValue, score);
+	hideResults();
+	showHighScores();
+}
+
+function addHighScore(initials, score) {
+	highScores.push({
+		initials: initials,
+		score: score
+	})
+	saveHighScores();
+}
+function hideResults() {
+	let results = document.getElementById("results");
+	results.style.display = "none";
+}
+
+function showHighScores() {
+	sortHighScores();
+	let highScoresSection = document.getElementById("highscores");
+	highScoresSection.style.display = "block";
+	let highScoresList = document.getElementById("highScoresList");
+	for (let highscore of highScores) {
+		let scoreListItem = document.createElement("li");
+		scoreListItem.innerText = `${highscore.initials} - ${highscore.score}`
+		highScoresList.appendChild(scoreListItem);
+	}
+
+}
+
+function sortHighScores() {
+	highScores.sort(function (highscoreA, highscoreB) {
+		if (highscoreA.score > highscoreB.score) {
+			return -1;
+		} else {
+			return 1;
+		}
+	})
+}
+function saveHighScores() {
+	localStorage.setItem("highScores", JSON.stringify(highScores))
+}
+loadHighScores();
+
+function handleGoBack() {
+	hideHighScores();
+	showIntro();
+	resetQuiz();
+	
+}
+function resetTimer() {
+	time = 71;
+}
+function handleClearHighScores() {
+	highScores = [];
+	saveHighScores();
+	showHighScores();
+}
+function hideHighScores() {
+	let highScoresSection = document.getElementById("highscores");
+	highScoresSection.style.display = "none";
+}
+function answerChoiceFeedback(result) {
+	let answerChoiceCheck = document.getElementById("checkanswer");
+	answerChoiceCheck.innerText=result;
+
+}
+function resetQuiz() {
+	resetTimer();
+	resetPosition();
+	resetCorrectAnswers();
+}
+function resetCorrectAnswers() {
+	correct = 0;
+}
+function resetPosition() {
+	position = 0;
+}
+
+let goBackButton = document.getElementById("goback");
+goBackButton.addEventListener("click", handleGoBack);
+
+let clearHighScoresButton = document.getElementById("clearhighscores");
+clearHighScoresButton.addEventListener("click", handleClearHighScores);
 
 let startbutton = document.getElementById("startquiz");
 startbutton.addEventListener("click", startquiz);
@@ -226,3 +274,5 @@ let answerChoice4 = document.getElementById("a4");
 answerChoice4.addEventListener("click", function () {
 	chooseAnswer("d");
 })
+let submitInitials = document.getElementById("submitscore");
+submitInitials.addEventListener("click", handleInitialSubmission);

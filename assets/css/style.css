@@ -39,3 +39,9 @@ body {
 #question {
   display: none;
 }
+#results {
+  display: none;
+}
+#highscores {
+  display: none;
+}
